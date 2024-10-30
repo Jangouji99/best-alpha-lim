@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import SearchResultLoader from '@components/ui/loaders/search-result-loader';
 import { useSendQuotation } from '@framework/order/send-quotation';
 import { useCompany } from '@contexts/company/company-context';
-import { OrderData, Product } from '@framework/types';
+import { CompanyInfo, OrderData, Product } from '@framework/types';
 import LottieAnimate from '@components/loading/LottieAnimate';
 import { useWishlistProductsQuery } from '@framework/product/get-wishlist-product';
 import useWindowSize from '@utils/use-window-size';
@@ -76,19 +76,32 @@ const CheckoutCard: React.FC<{ lang: string }> = ({ lang }) => {
   // Use the useSendQuotation hook at the top level
   const { mutate: sendQuotation, data: quotation, isSuccess, error } = useSendQuotation();
 
+  // Type guard to check that all required fields in companyInfo are valid
+  const isCompanyInfoValid = (companyInfo: CompanyInfo | undefined): boolean => {
+    return (
+      companyInfo !== undefined &&
+      !!companyInfo.name?.trim() &&
+      !!companyInfo.contact?.trim() &&
+      !!companyInfo.email?.trim() &&
+      !!companyInfo.representative?.trim() &&
+      companyInfo.address !== undefined &&
+      !!companyInfo.address.country?.trim() &&
+      !!companyInfo.address.city?.trim() &&
+      !!companyInfo.address.state?.trim() &&
+      !!companyInfo.address.zipCode?.trim() &&
+      !!companyInfo.address.address?.trim()
+    );
+  };
 
-  // Handler to trigger sending quotation
+  // Usage in handleSendQuotation
   const handleSendQuotation = () => {
-    const isCompanyInfoValid = companyInfo && companyInfo.companyName && companyInfo.contact && companyInfo.email;
-    if (!isCompanyInfoValid) {
+    if (!isCompanyInfoValid(orderData.companyInfo)) {
       // Toast notification
       setToastLoader(true);
       setTimeout(() => {
         setToastLoader(false);
       }, 1500);
 
-      // Add your toast notification here
-      // @ts-ignore
       toast(t('company_info_missing'), {
         progressClassName: 'fancy-progress-bar',
         position: width! > 768 ? 'bottom-right' : 'top-right',
@@ -98,11 +111,11 @@ const CheckoutCard: React.FC<{ lang: string }> = ({ lang }) => {
         pauseOnHover: true,
         draggable: true,
         style: {
-          backgroundColor: '#ff4d4f', // Background color
-          color: '#ffffff',           // Text color
+          backgroundColor: '#ff4d4f',
+          color: '#ffffff',
         },
         progressStyle: {
-          background: '#ffffff', // Progress bar color
+          background: '#ffffff',
         },
       });
 
