@@ -11,6 +11,8 @@ import logo from "@public/assets/images/logo/best-alpha-small.png"
 // external
 import 'react-toastify/dist/ReactToastify.css';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
 // base css file
 import '@assets/css/scrollbar.css';
 import '@assets/css/swiper-carousel.css';
@@ -59,7 +61,8 @@ export default function RootLayout({
         <Providers>
           <ManagedUIContext>
             {children}
-            <Analytics mode={'production'} />;
+            <Analytics mode={'production'} />
+            <SpeedInsights />
             <ManagedModal lang={lang} />
             <ManagedDrawer lang={lang} />
             <ToasterProvider />
